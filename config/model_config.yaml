@@ -1,0 +1,49 @@
+# Number of layers
+n_layers: 1
+
+# Max number of epochs (if no early stopping)
+max_epochs: 300
+
+# Learning rate config
+auto_lr_find: True
+default_lr: 0.001
+
+# Batch config
+auto_scale_batch_size: False
+default_batch_size: 64
+
+# Early stopping patience
+patience: 25
+
+# Number of past days taken into account for
+past_window: 7
+
+# Sizes of hidden layers
+hidden_size:
+  - 20 # lstm layer
+  - 50 # const features
+  - 15 # mixed layer
+
+# Droput probability
+dropout: 0.2
+
+# Random seed
+seed: 42
+
+no_norm_cols:
+  - shifted_r_estim # Just for testing
+  - shifted_r_estim_past # Just for testing
+  - shifted_r_estim_smooth # Just for testing
+  - r_estim # Just for testing
+  - case_smooth_past # Just for testing
+  - epi_progress
+  - epi_progress_rel
+  - epi_progress_rel_log
+  - epi_progress_log
+  - Africa
+  - Europe
+  - Asia
+  - North America
+  - South America
+  - Oceania
+

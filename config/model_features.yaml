@@ -1,0 +1,78 @@
+epi:
+    - test
+    - case
+    - death
+
+demography:
+#     - population
+    - population_density
+    - median_age
+    - aged_65_older
+    - aged_70_older
+    - gdp_per_capita
+    - human_development_index
+
+sanitary:
+    - diabetes_prevalence
+#     hospital_beds_per_thousand # poor availability
+    - life_expectancy
+
+continent:
+    - Africa
+    - Europe
+    - Asia
+    - North America
+    - South America
+    - Oceania
+
+mobi_google:
+    - retail_and_recreation_percent_change_from_baseline
+    - grocery_and_pharmacy_percent_change_from_baseline
+    - parks_percent_change_from_baseline
+    - transit_stations_percent_change_from_baseline
+    - workplaces_percent_change_from_baseline
+    - residential_percent_change_from_baseline
+
+mobi_apple:
+    - driving
+    - transit
+    - walking
+
+weather:
+    - maxtempC
+    - mintempC
+    - tempC
+    - FeelsLikeC
+    - humidity
+    - pressure
+    - HeatIndexC
+    - uvIndex
+    - totalSnow_cm
+    - sunHour
+    - windspeedKmph
+    - precipMM
+
+weekdays:
+    - monday
+    - tuesday
+    - wednesday
+    - thursday
+    - friday
+    - saturday
+    - sunday
+
+policies:
+    - c1_level # school closing level
+    - c2_level # workplace closing level
+    - c3_level # cancel public events level
+    - c4_level # restrictions on gathering size level
+    - c5_level # close public transport level
+    - c6_level # "shelter-in-place" and home confinement orders level
+    - c7_level # restrictions on internal movement level
+    - c8_level # restrictions on international travel level
+#     - h1_level # public information campaign level
+#     - h2_level # testing policy level
+#     - h3_level # contact tracing level
+    - h6_level # facial covering level
+#     - e1_level # debt/contract relief for households
+#     - e2_level # fiscal measures
