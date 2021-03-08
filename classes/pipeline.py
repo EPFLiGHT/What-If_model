@@ -11,7 +11,7 @@ from classes.hybrid import HybridLSTM
 class Pipeline:
 
   def __init__(self, df, train_cols, target_col, target_country,
-               context: Context):
+               context: Context, gpu_id=None):
     self.__context = context
     self.__df = df
     self.__train_cols = train_cols
@@ -19,10 +19,14 @@ class Pipeline:
     self.__target_country = target_country
     self.__model = None
 
+    if gpu_id is not None:
+      self.__gpus = 1
+      torch.cuda.set_device(gpu_id)
+    else:
+      self.__gpus = 0
+
   def __split_features(self):
     """ Split in constant and variable cols"""
-
-    print("__split_features CALLED")
 
     constant_cols = set()
     variable_cols = set()
@@ -52,8 +56,6 @@ class Pipeline:
   def __normalize(self):
     """ Normalizing data """
 
-    print("__normalize CALLED")
-
     # Decide what columns to normalize
     train_ndata = self.__df[self.__df['iso_code'] != self.__target_country]
     stds = train_ndata.std().values
@@ -70,8 +72,6 @@ class Pipeline:
 
   def __sliced_hybrid(self, group, const_cols, var_cols):
     """Slices a df to generate hybrid_lstm training data (stride=1), assumes the df is sorted by date and has no date dropped"""
-
-    print("__sliced_hybrid CALLED")
 
     past_window = self.__context.model_config()['past_window']
 
@@ -97,8 +97,6 @@ class Pipeline:
 
   def __split_train_val(self):
     """Trains a model for a given country in leave-one-out and make a prediction"""
-
-    print("__split_train_val CALLED")
 
     const_cols, var_cols = self.__split_features()
     self.__normalize()
@@ -132,7 +130,6 @@ class Pipeline:
     return train_data, val_data, const_cols, var_cols, sliced[3]
 
   def __save_model(self, trainer):
-    print("__save_model CALLED")
 
     """Save the model in the current parameter state"""
     save_dir = f'./models/{self.__target_country}'
@@ -142,7 +139,9 @@ class Pipeline:
 
   def __train_model(self, var_cols, const_cols, train_data, val_data,
                     save=True):
-    print("__train_model CALLED")
+
+    np.random.seed(42)
+    torch.manual_seed(42)
 
     # Same as train_data[1].size(1)
     past_window = self.__context.model_config()['past_window']
@@ -153,12 +152,12 @@ class Pipeline:
       'auto_scale_batch_size']
 
     # Create model
-    self.__model = HybridLSTM(self.__context, {"var_cols": var_cols,
-                                               "const_cols": const_cols,
-                                               "target_col": self.__target_col,
-                                               "country": self.__target_country,
-                                               "past_window": past_window})
-    self.__model.create_dataloaders(train_data, val_data)
+    model = HybridLSTM(self.__context, {"var_cols": var_cols,
+                                        "const_cols": const_cols,
+                                        "target_col": self.__target_col,
+                                        "country": self.__target_country,
+                                        "past_window": past_window})
+    model.create_dataloaders(train_data, val_data)
 
     # Callbacks
     early_stop_callback = EarlyStopping(monitor='val_loss',
@@ -170,19 +169,22 @@ class Pipeline:
     # Training
     logger = TensorBoardLogger('tb_logs',
                                name=f'hybrid_{self.__target_country}')
-    trainer = pl.Trainer(gpus=0, min_epochs=1, max_epochs=max_epochs,
+
+    trainer = pl.Trainer(gpus=self.__gpus, min_epochs=1, max_epochs=max_epochs,
                          auto_lr_find=auto_lr_find,
                          auto_scale_batch_size=auto_scale_batch_size,
                          progress_bar_refresh_rate=0,
                          callbacks=[early_stop_callback], logger=logger)
-    trainer.fit(self.__model)
+
+    trainer.fit(model)
+
+    self.__model = model
 
     # Save model
     if save:
       self.__save_model(trainer)
 
   def __inject_nans(self, pred, valid_mask):
-    print("__inject_nans CALLED")
 
     """
     Fill array with Nans, assume it has appended nans already to account
@@ -205,7 +207,7 @@ class Pipeline:
     return new_pred
 
   def __predict(self, val_data):
-    print("__predict CALLED")
+
     past_window = self.__context.model_config()['past_window']
 
     # Generate Final Prediction
@@ -216,7 +218,6 @@ class Pipeline:
     return pred, None
 
   def __predict_mcdropout(self, val_data, n_samples=20):
-    print("__predict_mcdropout CALLED")
 
     past_window = self.__context.model_config()['past_window']
 
@@ -233,8 +234,6 @@ class Pipeline:
 
   def fit_predict_pipeline(self, save_model=True, mc_dropout=False,
                            nb_samples=10):
-
-    print("fit_predict_pipeline CALLED")
 
     train_data, val_data, const_cols, var_cols, mask = self.__split_train_val()
 
