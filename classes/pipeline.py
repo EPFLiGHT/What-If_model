@@ -293,6 +293,6 @@ class Pipeline:
 
     # Save plot in memory
     if save_path is not None:
-      plt.savefig(save_path, bbox_inches='tight')
+      plt.savefig(save_path + self.__target_country + '.png', bbox_inches='tight')
     else:
       plt.show()
