@@ -2,6 +2,7 @@ import torch
 from torch import nn, optim
 import torch.nn.functional as F
 import pytorch_lightning as pl
+from pytorch_lightning import seed_everything
 from torch.utils.data import DataLoader, Dataset
 from argparse import Namespace
 from classes.context import Context
@@ -16,6 +17,9 @@ def MC_dropout(act_vec, p=0.5, mask=True):
 class HybridLSTM(pl.LightningModule):
 
   def __init__(self, context: Context, hparams):
+
+    # Setting the seed for this file
+    seed_everything(context.model_config()['seed'])
 
     super().__init__()
 
@@ -43,6 +47,7 @@ class HybridLSTM(pl.LightningModule):
 
     self.mixed_3 = nn.Linear(self.hidden_sizes[2], 1).double()
     self.mixed_4 = torch.nn.ReLU()
+
 
   def create_dataloaders(self, train_data, val_data):
 

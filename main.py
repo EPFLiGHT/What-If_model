@@ -3,7 +3,7 @@ from classes.pipeline import Pipeline
 import argparse
 
 context = Context()
-context.set_seed()
+
 
 features = context.model_features()
 
@@ -28,7 +28,10 @@ pipeline = Pipeline(data, train_cols, target_col, 'CHE', context, gpu_id=gpu)
 pred, std = pipeline.fit_predict_pipeline(save_model=False)
 
 # Std is None if MC_Dropout in fit_predict_pipeline is false.
-pipeline.plot_results(pred, std, save_path='./plots/')
+mse = pipeline.plot_results(pred, std, save_path='./plots/')
+
+
+print(f'The mean average error was {mse}')
 
 
 

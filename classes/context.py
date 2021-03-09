@@ -18,7 +18,7 @@ class Context:
     with open('config/model_features.yaml', 'r', encoding='utf-8') as file:
       self.__model_features = yaml.load(file, Loader=yaml.FullLoader)
 
-  def set_seed(self):
+    # Setting the seed for this file
     seed_everything(self.__model_config['seed'])
 
   def epi_config(self):

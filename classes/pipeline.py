@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import os
 import pytorch_lightning as pl
+from pytorch_lightning import seed_everything
 from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.loggers import TensorBoardLogger
 from classes.context import Context
@@ -10,10 +11,15 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 
+
 class Pipeline:
 
   def __init__(self, df, train_cols, target_col, target_country,
                context: Context, gpu_id=None):
+
+    # Setting the seed for this file
+    seed_everything(context.model_config()['seed'])
+
     self.__context = context
     self.__df = df
     self.__train_cols = train_cols
@@ -26,6 +32,8 @@ class Pipeline:
       torch.cuda.set_device(gpu_id)
     else:
       self.__gpus = 0
+
+
 
   def __split_features(self):
     """ Split in constant and variable cols"""
@@ -261,6 +269,8 @@ class Pipeline:
     index = self.__df.loc[test_indices].index
     ground = self.__df.loc[test_indices][self.__target_col]
 
+    mse = np.square(ground - pred).mean()
+
     error_curve = np.abs(ground - pred)
 
     fig = plt.figure(figsize=(12, 3), dpi=100)
@@ -296,3 +306,5 @@ class Pipeline:
       plt.savefig(save_path + self.__target_country + '.png', bbox_inches='tight')
     else:
       plt.show()
+
+    return mse
