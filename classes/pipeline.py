@@ -6,6 +6,8 @@ from pytorch_lightning.callbacks import EarlyStopping
 from pytorch_lightning.loggers import TensorBoardLogger
 from classes.context import Context
 from classes.hybrid import HybridLSTM
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 
 class Pipeline:
@@ -20,7 +22,7 @@ class Pipeline:
     self.__model = None
 
     if gpu_id is not None:
-      self.__gpus = 1
+      self.__gpus = [gpu_id]
       torch.cuda.set_device(gpu_id)
     else:
       self.__gpus = 0
@@ -71,7 +73,8 @@ class Pipeline:
     self.__df[norm_cols] = (self.__df[norm_cols] - train_mean) / train_std
 
   def __sliced_hybrid(self, group, const_cols, var_cols):
-    """Slices a df to generate hybrid_lstm training data (stride=1), assumes the df is sorted by date and has no date dropped"""
+    """Slices a df to generate hybrid_lstm training data (stride=1),
+		assumes the df is sorted by date and has no date dropped"""
 
     past_window = self.__context.model_config()['past_window']
 
@@ -152,12 +155,12 @@ class Pipeline:
       'auto_scale_batch_size']
 
     # Create model
-    model = HybridLSTM(self.__context, {"var_cols": var_cols,
-                                        "const_cols": const_cols,
-                                        "target_col": self.__target_col,
-                                        "country": self.__target_country,
-                                        "past_window": past_window})
-    model.create_dataloaders(train_data, val_data)
+    self.__model = HybridLSTM(self.__context, {"var_cols": var_cols,
+                                               "const_cols": const_cols,
+                                               "target_col": self.__target_col,
+                                               "country": self.__target_country,
+                                               "past_window": past_window})
+    self.__model.create_dataloaders(train_data, val_data)
 
     # Callbacks
     early_stop_callback = EarlyStopping(monitor='val_loss',
@@ -176,9 +179,7 @@ class Pipeline:
                          progress_bar_refresh_rate=0,
                          callbacks=[early_stop_callback], logger=logger)
 
-    trainer.fit(model)
-
-    self.__model = model
+    trainer.fit(self.__model)
 
     # Save model
     if save:
@@ -187,9 +188,9 @@ class Pipeline:
   def __inject_nans(self, pred, valid_mask):
 
     """
-    Fill array with Nans, assume it has appended nans already to account
-    for past_window size
-    """
+		Fill array with Nans, assume it has appended nans already to account
+		for past_window size
+		"""
 
     idx_to_fill = [e for e, x in enumerate(valid_mask) if x]
 
@@ -251,3 +252,47 @@ class Pipeline:
       std = self.__inject_nans(std, mask)
 
     return pred, std
+
+  def plot_results(self, pred, std=None, target_name='R', save_path=None, plot_error=True, ):
+    """Plot a target prediction for a given country"""
+
+    # Computing the ground truth (true R of the val set)
+    test_indices = self.__df['iso_code'] == self.__target_country
+    index = self.__df.loc[test_indices].index
+    ground = self.__df.loc[test_indices][self.__target_col]
+
+    error_curve = np.abs(ground - pred)
+
+    fig = plt.figure(figsize=(12, 3), dpi=100)
+
+    axis = plt.gca()
+
+    # Plot curves
+    axis.set_title(f'Predictions for {self.__target_country}')
+    axis.plot(index, ground, label=f'Ground {target_name}')
+    axis.plot(index, pred, label=f'Predicted {target_name}')
+
+    if plot_error:
+      axis.plot(index, error_curve, label='Absolute error')
+
+    if std is not None:
+      # 95% Confidence interval. Std is present only if we predict with Monte Carlo Dropout
+      ci = 1.96 * std
+      axis.fill_between(index, (pred - ci), (pred + ci), facecolor='r', alpha=.3)
+
+    # Setup x ticks
+    axis.xaxis.set_major_locator(mdates.DayLocator(interval=7))
+    axis.xaxis.set_tick_params(rotation=90)
+
+    # Legend and labels
+    axis.legend()
+    axis.set_ylabel(target_name)
+    axis.set_xlabel('Date')
+    axis.axhline(color='black', lw=1, ls='--', y=1)
+    axis.axhline(color='black', lw=1)
+
+    # Save plot in memory
+    if save_path is not None:
+      plt.savefig(save_path, bbox_inches='tight')
+    else:
+      plt.show()

@@ -27,4 +27,8 @@ if gpu is not None:
 pipeline = Pipeline(data, train_cols, target_col, 'CHE', context, gpu_id=gpu)
 pred, std = pipeline.fit_predict_pipeline(save_model=False)
 
-print(pred, std)
+# Std is None if MC_Dropout in fit_predict_pipeline is false.
+pipeline.plot_results(pred, std, save_path='./')
+
+
+
