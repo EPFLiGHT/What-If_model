@@ -159,8 +159,7 @@ class Pipeline:
     patience = self.__context.model_config()['patience']
     max_epochs = self.__context.model_config()['max_epochs']
     auto_lr_find = self.__context.model_config()['auto_lr_find']
-    auto_scale_batch_size = self.__context.model_config()[
-      'auto_scale_batch_size']
+    auto_scale_batch_size = self.__context.model_config()['auto_scale_batch_size']
 
     # Create model
     self.__model = HybridLSTM(self.__context, {"var_cols": var_cols,

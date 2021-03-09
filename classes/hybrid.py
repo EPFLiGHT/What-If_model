@@ -87,12 +87,12 @@ class HybridLSTM(pl.LightningModule):
 
   def train_dataloader(self):
     dataset = HybridDataset(self.train_data)
-    return DataLoader(dataset, batch_size=self.batch_size, num_workers=16,
-                      shuffle=True)
+    return DataLoader(dataset, batch_size=self.batch_size,
+                      shuffle=True) #num_workers = 16
 
   def val_dataloader(self):
     dataset = HybridDataset(self.val_data)
-    return DataLoader(dataset, batch_size=self.batch_size, num_workers=1)
+    return DataLoader(dataset, batch_size=self.batch_size,) #num_workers = 1
 
   def training_step(self, batch, batch_nb):
     x_mlp, x_lstm, y = batch
