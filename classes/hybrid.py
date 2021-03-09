@@ -26,7 +26,7 @@ class HybridLSTM(pl.LightningModule):
     if isinstance(hparams, dict):
       hparams = Namespace(**hparams)
     self.hparams = hparams
-
+    self.__debug = False
     self.hidden_sizes = context.model_config()['hidden_size']
     self.dropout = context.model_config()['dropout']
     self.lr = context.model_config()['default_lr']
@@ -48,6 +48,8 @@ class HybridLSTM(pl.LightningModule):
     self.mixed_3 = nn.Linear(self.hidden_sizes[2], 1).double()
     self.mixed_4 = torch.nn.ReLU()
 
+  def set_print(self, debug):
+    self.__debug = debug
 
   def create_dataloaders(self, train_data, val_data):
 
@@ -59,10 +61,13 @@ class HybridLSTM(pl.LightningModule):
     # if training or sampling, mc dropout will apply random binary mask
     # Otherwise, for regular test set evaluation, we can just scale activations
     mask = self.training or sample
+    x_mlp = x_mlp.double()
+    x_lstm = x_lstm.double()
+
 
     # x_mlp, x_lstm = x
     # x = (x_mlp, x_lstm)
-
+    
     x1, _ = self.lstm_1(x_lstm)
     x1 = x1[:, x1.size(1) - 1, :].clone()
     x1 = MC_dropout(x1, p=self.dropout, mask=mask)
