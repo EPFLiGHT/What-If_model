@@ -239,11 +239,19 @@ class Pipeline:
     return mean_pred, std_pred
 
   def fit_pipeline(self, save_model=True):
+    print("Training the model...\n")
     # Split trainig and validation
     self.__split_train_val()
 
     # Train the model
     self.__train_model(save_model)
+
+  def load_from_checkpoint(self):
+    print("Loading the model from a previous checkpoint...\n")
+    self.__model = HybridLSTM.load_from_checkpoint( f"./models/{self.__target_country}/{self.__target_country}-no_mob-mob-no_drop.ckpt",
+                                                    torch.device(f'cuda:{self.__gpus}' if self.__gpus else 'cpu'),
+                                                    context=self.__context)
+    self.__split_train_val()
 
   def get_model(self):
     return self.__model

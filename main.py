@@ -13,6 +13,9 @@ parser = argparse.ArgumentParser(description='IGH - WhatIf')
 parser.add_argument('-g', '--gpu', help="Select GPU")
 parser.add_argument('-c', '--country', required=True,
                     help='Select target country ISO code')
+parser.add_argument('-l', '--load_checkpoint', action='store_true',
+                    help='Load a model from a previous checkpoint')
+
 
 gpu = parser.parse_args().gpu
 target_iso = parser.parse_args().country.upper()
@@ -21,7 +24,10 @@ target_iso = parser.parse_args().country.upper()
 train_cols = features['demography'] + \
              features['sanitary'] + \
              features['weather'] + \
-             features['policies']
+             features['policies'] + \
+             features['mobi_google']
+
+
 
 # Target column
 target_col = 'shifted_r_estim'
@@ -40,8 +46,12 @@ if gpu is not None:
 # Instantiating the training and testing pipeline
 pipeline = Pipeline(data, train_cols, target_col, target_iso, context, gpu_id=gpu)
 
-# Fitting the model
-pipeline.fit_pipeline(save_model=False)
+# If we want to restart from a checkpoint
+if parser.parse_args().load_checkpoint:
+  pipeline.load_from_checkpoint()
+else:
+  # Fitting the model
+  pipeline.fit_pipeline(save_model=False)
 
 # Making the prediction on the selected country
 prediction = pipeline.predict()
