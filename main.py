@@ -61,5 +61,19 @@ prediction = pipeline.predict()
 plot = Plot(data, target_col, target_iso, save_path="./plots/")
 plot.plot_results(prediction, show=False)
 
-plot.plot_shap(pipeline.get_model(), pipeline.get_cols(), pipeline.get_data()[0], pipeline.get_data()[1], show=False)
-plot.plot_shap(pipeline.get_model(), pipeline.get_cols(), pipeline.get_data()[0], pipeline.get_data()[1], plot_bars=True, show=False)
+# Plotting the results: shap values
+
+const_col_names = ['Proportion > 65 y.o.', 'Proportion > 70 y.o.', 'Diabetes prevalence', 'GDP per capita',
+                   'Human development index', 'Life expectancy', 'Median age', 'Population density']
+
+var_col_names = ['Perceived temperature', 'Heat index', 'School closing', 'Workplace closing',
+                 'Cancel public events', 'Restrictions on gathering size', 'Close public transport',
+                 'Home confinement orders', 'Restrictions on internal movement',
+                 'Restrictions on international travel', 'Facial covering', 'Humidity', 'Max temperature',
+                 'Min temperature', 'Precipitations (mm)', 'Pressure', 'Sun hour', 'Temperature', 'Snow (cm)',
+                 'UV index', 'Wind speed (kmph)']
+
+plot.plot_shap(pipeline.get_model(), (const_col_names, var_col_names), pipeline.get_data()[0], pipeline.get_data()[1],
+               show=False)
+plot.plot_shap(pipeline.get_model(), (const_col_names, var_col_names), pipeline.get_data()[0], pipeline.get_data()[1],
+               plot_bars=True, show=False)

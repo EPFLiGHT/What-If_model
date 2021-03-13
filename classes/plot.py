@@ -62,7 +62,7 @@ class Plot:
 
     # Making a dataframe: column 1 is the feature, and column 2 is the correlation coefficient
     corr_df.columns = ['Variable', 'Corr']
-    corr_df['Sign'] = np.where(corr_df['Corr'] > 0, 'red', 'blue')
+    corr_df['Sign'] = np.where(corr_df['Corr'] > 0, '#eb3456', '#388cf3')
 
     # Plotting it
     shap_abs = np.abs(shap_v)
@@ -82,6 +82,7 @@ class Plot:
                                                                                            validation_data)
 
     const_col_names, var_col_names = column_names
+
     const_val_data_df = pd.DataFrame(data=const_val_data, columns=const_col_names)
     var_val_data_df = pd.DataFrame(data=var_val_data, columns=var_col_names)
 
