@@ -24,8 +24,9 @@ target_iso = parser.parse_args().country.upper()
 train_cols = features['demography'] + \
              features['sanitary'] + \
              features['weather'] + \
-             features['policies'] + \
-             features['mobi_google']
+             features['policies']
+             #features['mobi_google']
+
 
 
 
@@ -33,7 +34,7 @@ train_cols = features['demography'] + \
 target_col = 'shifted_r_estim'
 
 # Set Dropna=False, important. Data is the dataframe cleaned
-data = context.get_model_data(train_cols, target_col, dropna=False)
+data = context.get_model_data(train_cols, target_col, dropna=True)
 
 # If the selected country is not valid
 if target_iso not in data['iso_code'].unique():

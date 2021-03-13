@@ -60,6 +60,7 @@ class Context:
       data_country = data[data.iso_code == iso_code].r_estim.dropna()
       n_values = data_country.shape[0]
 
+
       # If rows exist for that country with a valid r_estim value
       if n_values > 0:
         n_days = (data_country.index[-1] - data_country.index[0]).days + 1
@@ -68,13 +69,18 @@ class Context:
         if ratio > min_ratio:
           iso_codes.append(iso_code)
 
-    return data[data.apply(lambda row: row.iso_code in iso_codes, axis=1)]
+
+    return data[data['iso_code'].isin(iso_codes)]
 
   def get_model_data(self, train_cols, target_col, continents=None,
                      dropna=True):
     # Loading the dataframe
     data = pd.read_csv('data/merged_data/model_data_owid.csv',
                        parse_dates=['date']).set_index('date')
+
+    # Taking only countries for which the number of NOT NAN in r_estim is > min ratio
+    data = Context.__filter_valid_countries(data,
+                                            self.__epi_config['min_ratio'])
 
     # Putting NaN where the reported r is larger than max_r
     data['r_estim'] = data['r_estim'].apply(
@@ -97,19 +103,24 @@ class Context:
     # Generate dummies for weekday and continents
     data = pd.get_dummies(data, prefix='', columns=['weekday', 'continent'])
 
+    # Saving some variables before dropping columns
+    cumul_cases = data['cumul_case']
+
+    # Remove unused columns
+    data = data[['iso_code'] + train_cols + [target_col]]
+
+    data = data[(data.index >= '2020-01-01') & (data.index <= '2021-02-02')]
+
     # If policy is not defined (wasn't applied at that time), its level is 0
     for x in data.columns:
       if 'level' in x:
         data[x] = data[x].fillna(0)
 
-    # Step 1: If there are not enough days with a r_estim, drop the country
-    data = Context.__filter_valid_countries(data,
-                                            self.__epi_config['min_ratio'])
-
     # Selecting all countries which surpassed `min_cases`
-    iso_codes = data[data.cumul_case > self.__epi_config['min_cases']].iso_code.unique()
+    iso_codes = data[cumul_cases > self.__epi_config['min_cases']].iso_code.unique()
+
     # Getting only rows related to those countries
-    data = data[data.apply(lambda row: row.iso_code in iso_codes, axis=1)]
+    data = data[data['iso_code'].isin(iso_codes)]
 
     # If continents filter is given
     if continents is not None:
@@ -118,11 +129,9 @@ class Context:
                                row.iso_code) in continents,
                              axis=1)]
 
-    # Remove unused columns
-    data = data[['iso_code'] + train_cols + [target_col]]
-
     # Remove lines for which we don't have complete data
     if dropna:
       data = data.dropna(subset=train_cols)
 
+    print(f"Number of considered countries: {len(data.iso_code.unique())}")
     return data

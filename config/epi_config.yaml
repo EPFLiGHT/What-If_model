@@ -6,7 +6,7 @@ r_shift: -11
 max_r: 4
 
 # Minimum number of total official cases to take a country into consideration
-min_cases: 50000
+min_cases: 2000 #50000
 
 # Minimum ratio of days with valid R estimation for a country to be considered
 min_ratio: 0.9

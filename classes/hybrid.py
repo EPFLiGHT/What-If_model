@@ -70,17 +70,17 @@ class HybridLSTM(pl.LightningModule):
     
     x1, _ = self.lstm_1(x_lstm)
     x1 = x1[:, x1.size(1) - 1, :].clone()
-    #x1 = MC_dropout(x1, p=self.dropout, mask=mask)
+    x1 = MC_dropout(x1, p=self.dropout, mask=mask)
 
     x2 = self.linear_1(x_mlp)
     x2 = self.linear_2(x2)
-    #x2 = MC_dropout(x2, p=self.dropout, mask=mask)
+    x2 = MC_dropout(x2, p=self.dropout, mask=mask)
 
     x = torch.cat((x1, x2), dim=1)
 
     x = self.mixed_1(x)
     x = self.mixed_2(x)
-    #x = MC_dropout(x, p=self.dropout, mask=mask)
+    x = MC_dropout(x, p=self.dropout, mask=mask)
 
     x = self.mixed_3(x)
     x = self.mixed_4(x)
