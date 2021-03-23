@@ -114,7 +114,7 @@ class Plot:
         plt.title(f"Features importances for {self.__target_country}")
         shap.summary_plot(var_shap_values, var_val_data_df)
 
-  def plot_results(self, pred, std=None, target_name='R', plot_error=True, show=True):
+  def plot_results(self, pred, std=None, target_name='R', plot_error=True, show=True, plot_ci = False):
     """Plot a target prediction for a given country"""
 
     # Computing the ground truth (true R of the val set)
@@ -140,6 +140,12 @@ class Plot:
     if plot_error:
       axis.plot(index, error_curve, label='Absolute error')
 
+    # Default confidence interval, not computed
+    if plot_ci:
+      lower = self.__df[test_indices]['epiforecasts_effective_reproduction_number_lower_90']
+      upper = self.__df[test_indices]['epiforecasts_effective_reproduction_number_upper_90']
+      axis.fill_between(index, lower, upper, facecolor='r', alpha=.3)
+
     if std is not None:
       # 95% Confidence interval. Std is present only if we predict with Monte Carlo Dropout
       ci = 1.96 * std
@@ -153,8 +159,8 @@ class Plot:
     axis.legend()
     axis.set_ylabel(target_name)
     axis.set_xlabel('Date')
-    axis.axhline(color='black', lw=1, ls='--', y=1)
-    axis.axhline(color='black', lw=1)
+    #axis.axhline(color='black', lw=1, ls='--', y=1)
+    #axis.axhline(color='black', lw=1)
 
     # Save plot in memory
     if not show:

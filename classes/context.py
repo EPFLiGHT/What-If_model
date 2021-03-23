@@ -78,6 +78,9 @@ class Context:
     data = pd.read_csv('data/merged_data/model_data_owid.csv',
                        parse_dates=['date']).set_index('date')
 
+    #data = pd.read_csv('data/merged_data/economic_cli.csv',
+                        #parse_dates=['date']).set_index('date')
+
     # Taking only countries for which the number of NOT NAN in r_estim is > min ratio
     data = Context.__filter_valid_countries(data,
                                             self.__epi_config['min_ratio'])
@@ -87,7 +90,7 @@ class Context:
       lambda x: np.nan if x >= self.__epi_config['max_r'] else x)
 
     # Generate shifted columns for r estimations (11 days)
-    # On average the reported cases are refered to 11 days before
+    # On average the reported cases are referred to 11 days before
     data['shifted_r_estim'] = data['r_estim'].shift(
       self.__epi_config['r_shift']).where(
       data['iso_code'].eq(data['iso_code'].shift(self.__epi_config['r_shift'])))
@@ -109,7 +112,7 @@ class Context:
     # Remove unused columns
     data = data[['iso_code'] + train_cols + [target_col]]
 
-    data = data[(data.index >= '2020-01-01') & (data.index <= '2021-02-02')]
+    #data = data[(data.index >= '2020-01-01')] #2021-02-02
 
     # If policy is not defined (wasn't applied at that time), its level is 0
     for x in data.columns:
@@ -133,5 +136,6 @@ class Context:
     if dropna:
       data = data.dropna(subset=train_cols)
 
+    data = data[data.index >= '2020-04-01']
     print(f"Number of considered countries: {len(data.iso_code.unique())}")
     return data

@@ -34,6 +34,7 @@ class Pipeline:
     if gpu_id is not None:
       self.__gpus = [gpu_id]
       torch.cuda.set_device(gpu_id)
+
     else:
       self.__gpus = 0
 
@@ -62,6 +63,7 @@ class Pipeline:
 
     self.__const_cols = sorted(list(constant_cols))
     self.__var_cols = sorted(list(variable_cols))
+
 
   def __normalize(self):
     """ Normalizing data """
@@ -115,7 +117,7 @@ class Pipeline:
     # Get train and test indices for given df
     train_indices = self.__df['iso_code'] != self.__target_country
     test_indices = ~train_indices
-
+    
     # Train and validation data
     grouped = self.__df.loc[train_indices].groupby('iso_code').apply(
       lambda group: self.__sliced_hybrid(group, self.__const_cols, self.__var_cols))
@@ -164,6 +166,7 @@ class Pipeline:
                                                "country": self.__target_country,
                                                "past_window": past_window})
     self.__model.create_dataloaders(self.__train_data, self.__val_data)
+    
 
     # Callbacks
     early_stop_callback = EarlyStopping(monitor='val_loss',
@@ -240,9 +243,10 @@ class Pipeline:
 
   def fit_pipeline(self, save_model=True):
     print("Training the model...\n")
+
+
     # Split trainig and validation
     self.__split_train_val()
-
     # Train the model
     self.__train_model(save_model)
 

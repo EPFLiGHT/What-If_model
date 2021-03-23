@@ -34,7 +34,7 @@ train_cols = features['demography'] + \
 target_col = 'shifted_r_estim'
 
 # Set Dropna=False, important. Data is the dataframe cleaned
-data = context.get_model_data(train_cols, target_col, dropna=True)
+data = context.get_model_data(train_cols, target_col, dropna=False)
 
 # If the selected country is not valid
 if target_iso not in data['iso_code'].unique():
@@ -59,7 +59,7 @@ prediction = pipeline.predict()
 
 # Plotting the results: main plot (prediction against ground truth)
 plot = Plot(data, target_col, target_iso, save_path="./plots/")
-plot.plot_results(prediction, show=False)
+plot.plot_results(prediction, show=False, plot_error= False)
 
 # Plotting the results: shap values
 
@@ -69,7 +69,7 @@ const_col_names = ['Proportion > 65 y.o.', 'Proportion > 70 y.o.', 'Diabetes pre
 var_col_names = ['Perceived temperature', 'Heat index', 'School closing', 'Workplace closing',
                  'Cancel public events', 'Restrictions on gathering size', 'Close public transport',
                  'Home confinement orders', 'Restrictions on internal movement',
-                 'Restrictions on international travel', 'Facial covering', 'Humidity', 'Max temperature',
+                 'Restrictions on international trav el', 'Facial covering', 'Humidity', 'Max temperature',
                  'Min temperature', 'Precipitations (mm)', 'Pressure', 'Sun hour', 'Temperature', 'Snow (cm)',
                  'UV index', 'Wind speed (kmph)']
 
