@@ -257,11 +257,12 @@ class Pipeline:
                                                     context=self.__context)
     self.__split_train_val()
 
-  def get_model(self):
-    return self.__model
-
+  
   def get_data(self):
     return self.__train_data, self.__val_data
 
   def get_cols(self):
     return self.__const_cols, self.__var_cols
+
+  def get_model(self):
+    return self.__model

@@ -75,23 +75,26 @@ class Plot:
     ax.set_title(f"Policy impact for {self.__target_country}")
     ax.set_xlabel("SHAP Value (Blue = Lower reproduction rate)")
 
-  def plot_shap(self, fitted_model, column_names, train_data, validation_data, plot_bars=False, show=True):
+  def plot_shap(self, fitted_model, const_col_names, var_col_names, train_data, validation_data, cols_to_drop=[],
+                plot_bars=False, show=True):
 
     # Computing shap values for constant and variable features, on the validation data
     const_val_data, const_shap_values, var_val_data, var_shap_values = self.__compute_shap(fitted_model, train_data,
                                                                                            validation_data)
 
-    const_col_names, var_col_names = column_names
-
     const_val_data_df = pd.DataFrame(data=const_val_data, columns=const_col_names)
     var_val_data_df = pd.DataFrame(data=var_val_data, columns=var_col_names)
+    var_val_data_df.drop(columns=cols_to_drop, inplace=True)
+
+    var_shap_df = pd.DataFrame(data=var_shap_values, columns=var_col_names)
+    var_shap_df.drop(columns=cols_to_drop, inplace=True)
 
     if plot_bars:
       fig1, ax1 = plt.subplots(1, 1, figsize=(12, 10))
       self.__plot_shap_bars(const_shap_values, const_val_data_df, ax1)
 
       fig2, ax2 = plt.subplots(1, 1, figsize=(12, 10))
-      self.__plot_shap_bars(var_shap_values, var_val_data_df, ax2)
+      self.__plot_shap_bars(var_shap_df.values, var_val_data_df, ax2)
 
       if not show:
         fig1.savefig(f"{self.__save_path}{self.__target_country}_barplot_const.png", bbox_inches='tight')
@@ -105,14 +108,14 @@ class Plot:
         shap.summary_plot(const_shap_values, const_val_data_df, show=False, plot_size = (15, 15))
         plt.savefig(f"{self.__save_path}{self.__target_country}_beeswarm_const.png", bbox_inches='tight')
         plt.clf()
-        shap.summary_plot(var_shap_values, var_val_data_df, show=False, plot_size = (15, 15))
+        shap.summary_plot(var_shap_df.values, var_val_data_df, show=False, plot_size = (15, 15))
         plt.savefig(f"{self.__save_path}{self.__target_country}_beeswarm_var.png", bbox_inches='tight')
         plt.clf()
       else:
         plt.title(f"Features importances for {self.__target_country}")
         shap.summary_plot(const_shap_values, const_val_data_df)
         plt.title(f"Features importances for {self.__target_country}")
-        shap.summary_plot(var_shap_values, var_val_data_df)
+        shap.summary_plot(var_shap_df.values, var_val_data_df)
 
   def plot_results(self, pred, std=None, target_name='R', plot_error=True, show=True, plot_ci = False):
     """Plot a target prediction for a given country"""
