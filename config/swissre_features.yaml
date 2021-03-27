@@ -139,6 +139,22 @@ policies:
         - restrictions_on_internal_movement
         - international_travel_controls
 
+vaccines:
+    - total_vaccinations
+    - people_vaccinated
+    - people_fully_vaccinated
+    - daily_vaccinations
+    - Johnson&Johnson
+    - Sputnik V
+    - Pfizer/BioNTech
+    - Oxford/AstraZeneca
+    - EpiVacCorona
+    - Sinopharm/Beijing
+    - Moderna
+    - Covaxin
+    - Sinovac
+    - Sinopharm/Wuhan
+
 outcomes:
     to_drop:
         - epiforecasts_effective_reproduction_number_lower_50

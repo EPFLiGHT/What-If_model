@@ -1,3 +1,8 @@
+main:
+    #- country_id
+    - location
+    - iso_code
+
 epi:
     - test
     - case
@@ -76,3 +81,7 @@ policies:
     - h6_level # facial covering level
 #     - e1_level # debt/contract relief for households
 #     - e2_level # fiscal measures
+
+outcomes:
+    to_use:
+        - epiforecasts_effective_reproduction_number_median
