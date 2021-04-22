@@ -16,7 +16,7 @@ default_batch_size: 64
 patience: 25
 
 # Number of past days taken into account for
-past_window: 7
+#past_window: 7
 
 # Sizes of hidden layers
 hidden_size:

@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import torch
 import os
 import pytorch_lightning as pl
@@ -11,7 +12,7 @@ from classes.hybrid import HybridLSTM
 
 class Pipeline:
 
-  def __init__(self, df, train_cols, target_col, target_country,
+  def __init__(self, df, train_cols, target_col, target_country, window_size,
                context: Context, gpu_id=None):
 
     # Setting the seed for this file
@@ -30,6 +31,9 @@ class Pipeline:
     # Mask used to remember for which days it was not possible to make a prediction.
     # Check the `inject_nans` function
     self.__prediction_mask = None
+    self.__window_size = window_size
+
+    self.__train_mean, self.__train_std = 0, 0
 
     if gpu_id is not None:
       self.__gpus = [gpu_id]
@@ -76,24 +80,22 @@ class Pipeline:
                  and (s != 0)]
 
     # Get train weights on train countries to avoid info leak
-    train_mean = train_ndata[norm_cols].mean()
-    train_std = train_ndata[norm_cols].std()
+    self.__train_mean = train_ndata[norm_cols].mean()
+    self.__train_std = train_ndata[norm_cols].std()
 
     # Normalizing both (train and test) using only the columns to normalize
-    self.__df[norm_cols] = (self.__df[norm_cols] - train_mean) / train_std
+    self.__df[norm_cols] = (self.__df[norm_cols] - self.__train_mean) / self.__train_std
 
   def __sliced_hybrid(self, group, const_cols, var_cols):
     """ Slices a df to generate hybrid_lstm training data (stride=1), assumes the df is sorted by date and has no date
     dropped """
 
-    past_window = self.__context.model_config()['past_window']
-
     # Regular slicing
     train_cols = var_cols + const_cols
     dates = group.index
-    slices = np.array([group[train_cols].values[i:i + past_window] for i in
-                       range(len(group) - past_window + 1)])
-    targets = group[self.__target_col].values[past_window - 1:]
+    slices = np.array([group[train_cols].values[i:i + self.__window_size] for i in
+                       range(len(group) - self.__window_size + 1)])
+    targets = group[self.__target_col].values[self.__window_size - 1:]
 
     # Mask for training and prediction
     valid_inp = np.array([not np.isnan(x).any() for x in slices])
@@ -152,8 +154,6 @@ class Pipeline:
     np.random.seed(42)
     torch.manual_seed(42)
 
-    # Same as train_data[1].size(1)
-    past_window = self.__context.model_config()['past_window']
     patience = self.__context.model_config()['patience']
     max_epochs = self.__context.model_config()['max_epochs']
     auto_lr_find = self.__context.model_config()['auto_lr_find']
@@ -164,7 +164,7 @@ class Pipeline:
                                                "const_cols": self.__const_cols,
                                                "target_col": self.__target_col,
                                                "country": self.__target_country,
-                                               "past_window": past_window})
+                                               "past_window": self.__window_size})
     self.__model.create_dataloaders(self.__train_data, self.__val_data)
     
 
@@ -209,14 +209,29 @@ class Pipeline:
     new_pred = np.append([np.nan] * nb_appended, new_pred)
     return new_pred
 
+  def single_prediction(self, var_names, const_names, var_features, const_features, norm_const=False, norm_var=False):
+
+    df_vars = pd.DataFrame(var_features, columns=var_names)
+    df_const = pd.DataFrame(const_features, columns=const_names)
+
+    if norm_var:
+      for var_feat_name in df_vars.columns:
+        df_vars[var_feat_name] = (df_vars[var_feat_name] - self.__train_mean[var_feat_name]) / self.__train_std[var_feat_name]
+
+    if norm_const:
+      for const_feat_name in df_const.columns:
+        df_const[const_feat_name] = (df_const[const_feat_name] - self.__train_mean[const_feat_name]) / self.__train_std[const_feat_name]
+
+    pred = self.__model.eval()(torch.from_numpy(df_const.values.reshape(1,-1)),
+                               torch.from_numpy(df_vars.values).unsqueeze(0)).detach()
+
+    return pred
+
   def predict(self):
-
-    past_window = self.__context.model_config()['past_window']
-
     # Generate Final Prediction
     pred = self.__model.eval()(*(self.__val_data[0], self.__val_data[1])).detach()
     pred = pred.reshape(pred.size(0)).numpy()
-    pred = np.append([np.nan] * (past_window - 1), pred).flatten()
+    pred = np.append([np.nan] * (self.__window_size - 1), pred).flatten()
 
     # Appending NaNs for impossible predictions (missing data in features)
     pred = self.__inject_nans(pred)
@@ -224,16 +239,14 @@ class Pipeline:
     return pred
 
   def predict_mcdropout(self, n_samples=20):
-    past_window = self.__context.model_config()['past_window']
-
     mean_pred, std_pred = self.__model.sample_predict(self.__val_data[0], self.__val_data[1],
                                                       n_samples)
 
     mean_pred = mean_pred.reshape(mean_pred.size(0)).numpy()
-    mean_pred = np.append([np.nan] * (past_window - 1), mean_pred).flatten()
+    mean_pred = np.append([np.nan] * (self.__window_size - 1), mean_pred).flatten()
 
     std_pred = std_pred.reshape(std_pred.size(0)).numpy()
-    std_pred = np.append([np.nan] * (past_window - 1), std_pred).flatten()
+    std_pred = np.append([np.nan] * (self.__window_size - 1), std_pred).flatten()
 
     # Appending NaNs for impossible predictions (missing data in features)
     mean_pred = self.__inject_nans(mean_pred)
@@ -266,3 +279,12 @@ class Pipeline:
 
   def get_model(self):
     return self.__model
+
+  def get_denorm_data(self, names, values):
+
+    df = pd.DataFrame(values, columns=names)
+
+    for var_feat_name in df.columns:
+      df[var_feat_name] = (df[var_feat_name] * self.__train_std[var_feat_name]) + self.__train_mean[var_feat_name]
+
+    return df.values

@@ -54,34 +54,36 @@ sanitary:
     - nurses_per_1000
 
 economic:
-    - unemployment_rate_2019_03_31 
-    - unemployment_rate_2019_06_30 
-    - unemployment_rate_2019_09_30 
-    - unemployment_rate_2019_12_31
-    - unemployment_rate_2020_03_31 
-    - unemployment_rate_2020_06_30 
-    - unemployment_rate_2020_09_30 
-    - unemployment_rate_2020_12_31
-    - unemployment_rate_2021_03_31 
-    - unemployment_rate_2021_06_30 
-    - unemployment_rate_2021_09_30 
-    - unemployment_rate_2021_12_31
-    - gdp_2019_03_31 
-    - gdp_2019_06_30 
-    - gdp_2019_09_30 
-    - gdp_2019_12_31
-    - gdp_2020_03_31 
-    - gdp_2020_06_30 
-    - gdp_2020_09_30 
-    - gdp_2020_12_31
-    - gdp_2021_03_31 
-    - gdp_2021_06_30 
-    - gdp_2021_09_30 
-    - gdp_2021_12_31
-    - fiscal_measures
-    # - monetary_measures
-    - emergency_investment_in_health_care
-    - investment_in_vaccines
+    #to_drop:
+        
+    to_use:
+        - unemployment_rate_2020_03_31 
+        - unemployment_rate_2020_06_30 
+        - unemployment_rate_2020_09_30 
+        - unemployment_rate_2020_12_31
+        - unemployment_rate_2021_03_31 
+        - unemployment_rate_2021_06_30 
+        - unemployment_rate_2021_09_30 
+        - unemployment_rate_2021_12_31
+        - unemployment_rate_2019_03_31 
+        - unemployment_rate_2019_06_30 
+        - unemployment_rate_2019_09_30 
+        - unemployment_rate_2019_12_31
+        - gdp_2019_03_31 
+        - gdp_2019_06_30 
+        - gdp_2019_09_30 
+        - gdp_2019_12_31
+        - gdp_2020_03_31 
+        - gdp_2020_06_30 
+        - gdp_2020_09_30 
+        - gdp_2020_12_31
+        - gdp_2021_03_31 
+        - gdp_2021_06_30 
+        - gdp_2021_09_30 
+        - gdp_2021_12_31
+        - fiscal_measures
+        - emergency_investment_in_health_care
+        - investment_in_vaccines
     
 weather:
     - maxtempC
@@ -140,20 +142,27 @@ policies:
         - international_travel_controls
 
 vaccines:
-    - total_vaccinations
-    - people_vaccinated
-    - people_fully_vaccinated
-    - daily_vaccinations
-    - Johnson&Johnson
-    - Sputnik V
-    - Pfizer/BioNTech
-    - Oxford/AstraZeneca
-    - EpiVacCorona
-    - Sinopharm/Beijing
-    - Moderna
-    - Covaxin
-    - Sinovac
-    - Sinopharm/Wuhan
+    # FOR RL: ONLY POLICY
+    to_use:
+        - vaccines_available
+        - Johnson&Johnson
+        - Sputnik V
+        - Pfizer/BioNTech
+        - Oxford/AstraZeneca
+        - EpiVacCorona
+        - Sinopharm/Beijing
+        - Moderna
+        - Covaxin
+        - Sinovac
+        - Sinopharm/Wuhan
+        - total_vaccinations
+        - people_vaccinated
+        - people_fully_vaccinated
+        - daily_vaccinations
+    
+    #to_drop:
+        
+    
 
 outcomes:
     to_drop:
