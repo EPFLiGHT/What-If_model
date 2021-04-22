@@ -172,6 +172,5 @@ outcomes:
         - epiforecasts_effective_reproduction_number_median
         - epiforecasts_effective_reproduction_number_lower_90
         - epiforecasts_effective_reproduction_number_upper_90
-        - r_estim
         - new_deaths
     
