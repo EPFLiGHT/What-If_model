@@ -100,18 +100,36 @@ class HybridLSTM(pl.LightningModule):
     return DataLoader(dataset, batch_size=self.batch_size,) #num_workers = 1
 
   def training_step(self, batch, batch_nb):
-    x_mlp, x_lstm, y = batch
-    pred = self(x_mlp, x_lstm)
-    pred = pred.reshape(pred.size(0))
-    loss = nn.functional.mse_loss(pred, y)
+    if len(batch) == 3:
+      x_mlp, x_lstm, y = batch
+      pred = self(x_mlp, x_lstm)
+      pred = pred.reshape(pred.size(0))
+      loss = nn.functional.mse_loss(pred, y)
+    else:
+      x_mlp, x_lstm, y, discount = batch
+      pred = self(x_mlp, x_lstm)
+      pred = pred.reshape(pred.size(0))
+      loss = nn.functional.mse_loss(pred, y, reduction='none')
+      loss = torch.sum(loss * discount) / torch.sum(discount)
+
     self.log('train_loss', loss)
     return {'loss': loss}
 
+
+
   def validation_step(self, batch, batch_nb):
-    x_mlp, x_lstm, y = batch
-    pred = self(x_mlp, x_lstm)
-    pred = pred.reshape(pred.size(0))
-    loss = nn.functional.mse_loss(pred, y)
+    if len(batch) == 3:
+      x_mlp, x_lstm, y = batch
+      pred = self(x_mlp, x_lstm)
+      pred = pred.reshape(pred.size(0))
+      loss = nn.functional.mse_loss(pred, y)
+    else:
+      x_mlp, x_lstm, y, discount = batch
+      pred = self(x_mlp, x_lstm)
+      pred = pred.reshape(pred.size(0))
+      loss = nn.functional.mse_loss(pred, y, reduction='none')
+      loss = torch.sum(loss * discount) / torch.sum(discount)
+
     self.log('val_loss', loss)
     return {'val_loss': loss}
 
@@ -138,10 +156,13 @@ class HybridLSTM(pl.LightningModule):
 
 class HybridDataset(Dataset):
   def __init__(self, data):
-    self.X_mlp, self.X_lstm, self.y = data
+    self.X_mlp, self.X_lstm, self.y, self.discount = data
 
   def __getitem__(self, index):
-    return self.X_mlp[index], self.X_lstm[index], self.y[index]
+    if self.discount is not None:
+      return self.X_mlp[index], self.X_lstm[index], self.y[index], self.discount[index]
+    else:
+      return self.X_mlp[index], self.X_lstm[index], self.y[index]
 
   def __len__(self):
     return self.y.size()[0]

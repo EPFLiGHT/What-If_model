@@ -13,7 +13,7 @@ from classes.hybrid import HybridLSTM
 class Pipeline:
 
   def __init__(self, df, train_cols, target_col, target_country, window_size,
-               context: Context, gpu_id=None):
+               context: Context, discount_col=None, gpu_id=None):
 
     # Setting the seed for this file
     seed_everything(context.model_config()['seed'])
@@ -22,6 +22,10 @@ class Pipeline:
     self.__df = df
     self.__train_cols = train_cols
     self.__target_col = target_col
+
+    # Used to assign a weight to each datapoint in the economic predictions
+    self.__discount_col = discount_col
+
     self.__target_country = target_country
     self.__model = None
     self.__train_data = None  # Data used for training, will be returned by split_train_val
@@ -32,6 +36,8 @@ class Pipeline:
     # Check the `inject_nans` function
     self.__prediction_mask = None
     self.__window_size = window_size
+
+
 
     self.__train_mean, self.__train_std = 0, 0
 
@@ -108,6 +114,11 @@ class Pipeline:
     const_features = slices[:, :, -len(const_cols):].mean(axis=1)
     var_features = slices[:, :, :len(var_cols)]
 
+    if self.__discount_col is not None:
+      discounts = group[self.__discount_col].values[self.__window_size - 1:]
+      discounts = discounts[valid_dates]
+      return const_features, var_features, targets, valid_dates, discounts
+
     return const_features, var_features, targets, valid_dates
 
   def __split_train_val(self):
@@ -130,14 +141,23 @@ class Pipeline:
       np.array([x for g in grouped for x in g[0]]))
     X_train_var = torch.from_numpy(np.array([x for g in grouped for x in g[1]]))
     y_train = torch.from_numpy(np.array([x for g in grouped for x in g[2]]))
-    self.__train_data = (X_train_const, X_train_var, y_train)
+
+    discount_train = None
+    if self.__discount_col is not None:
+      discount_train = torch.from_numpy(np.array([x for g in grouped for x in g[4]]))
+
+    self.__train_data = (X_train_const, X_train_var, y_train, discount_train)
 
     # Constant and variable features and target for each country
     # for the validation (only one country)
     sliced = self.__sliced_hybrid(self.__df[test_indices], self.__const_cols, self.__var_cols)
 
-    self.__val_data = (torch.from_numpy(sliced[0]), torch.from_numpy(sliced[1]),
-                       torch.from_numpy(sliced[2]))
+    discount_val = None
+    if self.__discount_col is not None:
+      discount_val = torch.from_numpy(np.array(sliced[4]))
+
+    self.__val_data = (torch.from_numpy(sliced[0]), torch.from_numpy(sliced[1]), torch.from_numpy(sliced[2]),
+                       discount_val)
 
     self.__prediction_mask = sliced[3]
 

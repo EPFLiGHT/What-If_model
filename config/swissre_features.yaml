@@ -54,15 +54,14 @@ sanitary:
     - nurses_per_1000
 
 economic:
-    #to_drop:
-        
-    to_use:
+    to_drop:
         - unemployment_rate_2020_03_31 
         - unemployment_rate_2020_06_30 
         - unemployment_rate_2020_09_30 
         - unemployment_rate_2020_12_31
         - unemployment_rate_2021_03_31 
         - unemployment_rate_2021_06_30 
+    to_use:
         - unemployment_rate_2021_09_30 
         - unemployment_rate_2021_12_31
         - unemployment_rate_2019_03_31 
