@@ -1,6 +1,6 @@
 # Shifting value for reproduction number
 # infection to report delay
-r_shift: -11
+#r_shift: -11
 
 # Maximum value of reproduction number to consider
 max_r: 4

@@ -1,0 +1,103 @@
+main:
+    #- country_id
+    - name
+    - iso_code
+    - cases
+
+demography:
+    - total_population_all
+    - total_population_below_1
+    - total_population_1_to_4
+    - total_population_5_to_14
+    - total_population_15_to_24
+    - total_population_25_to_34
+    - total_population_35_to_54
+    - total_population_55_to_74
+    - total_population_above_75
+    - population_percentage_over_60
+    
+sanitary:
+    - hospital_beds_per_1000
+    - physicians_per_1000
+    - nurses_per_1000
+
+economic:
+    - unemployment_rate_2021_09_30 
+    - unemployment_rate_2021_12_31
+    - unemployment_rate_2019_03_31 
+    - unemployment_rate_2019_06_30 
+    - unemployment_rate_2019_09_30 
+    - unemployment_rate_2019_12_31
+    - gdp_2019_03_31 
+    - gdp_2019_06_30 
+    - gdp_2019_09_30 
+    - gdp_2019_12_31
+    - gdp_2020_03_31 
+    - gdp_2020_06_30 
+    - gdp_2020_09_30 
+    - gdp_2020_12_31
+    - gdp_2021_03_31 
+    - gdp_2021_06_30 
+    - gdp_2021_09_30 
+    - gdp_2021_12_31
+    - fiscal_measures
+    - emergency_investment_in_health_care
+    - investment_in_vaccines
+    - unemployment_rate_2020_03_31 
+    - unemployment_rate_2020_06_30 
+    - unemployment_rate_2020_09_30 
+    - unemployment_rate_2020_12_31
+    - unemployment_rate_2021_03_31 
+    - unemployment_rate_2021_06_30 
+
+    
+    
+weather:
+    - maxtempC
+    - mintempC
+    - tempC
+    - FeelsLikeC
+    - humidity
+    - pressure
+    - HeatIndexC
+    - uvIndex
+    - totalSnow_cm
+    - sunHour
+    - windspeedKmph
+    - precipMM
+
+policies:
+    - school_closing
+    - workplace_closing
+    - cancel_public_events
+    - restrictions_on_gatherings
+    - close_public_transport
+    - stay_at_home_requirements
+    - public_information_campaigns
+    - testing_policy
+    - vaccination_policy
+    - contact_tracing
+    - restrictions_on_internal_movement
+    - international_travel_controls
+
+vaccines:
+    - Johnson&Johnson
+    - Sputnik V
+    - Pfizer/BioNTech
+    - Oxford/AstraZeneca
+    - EpiVacCorona
+    - Sinopharm/Beijing
+    - Moderna
+    - Covaxin
+    - Sinovac
+    - Sinopharm/Wuhan
+    - total_vaccinations
+    - people_vaccinated
+    - people_fully_vaccinated
+    - daily_vaccinations
+    - vaccines_available
+
+outcome:
+    - epiforecasts_effective_reproduction_number_median
+        
+    
