@@ -160,10 +160,6 @@ class Pipeline:
                        discount_val)
 
     self.__prediction_mask = sliced[3]
-    
-    print(self.__train_data)
-    print("\n\nValidation data\n\n")
-    print(self.__val_data)
 
   def __save_model(self, trainer):
     """Save the model in the current parameter state"""
@@ -207,7 +203,7 @@ class Pipeline:
                          auto_lr_find=auto_lr_find,
                          auto_scale_batch_size=auto_scale_batch_size,
                          progress_bar_refresh_rate=0,
-                         logger=logger) #callbacks=[early_stop_callback], 
+                         callbacks=[early_stop_callback], logger=logger)
 
     trainer.fit(self.__model)
 
