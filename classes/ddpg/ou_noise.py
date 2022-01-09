@@ -2,7 +2,7 @@ import numpy as np
 
 
 class OUNoise(object):
-  def __init__(self, space_low=-1, space_high=1, size=1, dt=1e-2, mu=0.0, theta=0.15, sigma=0.2):
+  def __init__(self, space_low=-1, space_high=1, size=1, dt=1e-2, mu=0.0, theta=0.15, sigma=1): #sigma = 0.2
     self.mu = mu
     self.theta = theta
     self.sigma = sigma

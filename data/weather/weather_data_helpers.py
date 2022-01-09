@@ -25,7 +25,8 @@ weather_attributes = [
     'precipMM',
 ]
 
-today = pd.to_datetime("today")-pd.Timedelta(days=1)
+#today = pd.to_datetime("today")-pd.Timedelta(days=1)
+today = pd.to_datetime("01 june 2021")-pd.Timedelta(days=1)
 today_str = today.strftime('%d-%b-%Y').upper()
 beginning = pd.to_datetime('01 jan 2020')
 beginning_str = beginning.strftime('%d-%b-%Y').upper()

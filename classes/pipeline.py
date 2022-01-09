@@ -97,7 +97,7 @@ class Pipeline:
     dropped """
 
     # Regular slicing
-    train_cols = var_cols + const_cols
+    train_cols = sorted(var_cols) + sorted(const_cols)
     dates = group.index
     slices = np.array([group[train_cols].values[i:i + self.__window_size] for i in
                        range(len(group) - self.__window_size + 1)])
@@ -160,6 +160,10 @@ class Pipeline:
                        discount_val)
 
     self.__prediction_mask = sliced[3]
+    
+    print(self.__train_data)
+    print("\n\nValidation data\n\n")
+    print(self.__val_data)
 
   def __save_model(self, trainer):
     """Save the model in the current parameter state"""
@@ -203,7 +207,7 @@ class Pipeline:
                          auto_lr_find=auto_lr_find,
                          auto_scale_batch_size=auto_scale_batch_size,
                          progress_bar_refresh_rate=0,
-                         callbacks=[early_stop_callback], logger=logger)
+                         logger=logger) #callbacks=[early_stop_callback], 
 
     trainer.fit(self.__model)
 

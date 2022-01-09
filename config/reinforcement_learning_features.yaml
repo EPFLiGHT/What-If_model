@@ -85,9 +85,9 @@ policies:
     - restrictions_on_gatherings
     - close_public_transport
     - stay_at_home_requirements
-    - public_information_campaigns
+#    - public_information_campaigns
     - testing_policy
-    - vaccination_policy
+#    - vaccination_policy
     - contact_tracing
     - restrictions_on_internal_movement
     - international_travel_controls
@@ -110,4 +110,3 @@ outcome:
         - epiforecasts_effective_reproduction_number_median
     unemp_rate:
         - unemployment_rate_idx
-        

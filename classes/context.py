@@ -75,7 +75,7 @@ class Context:
   def get_model_data(self, train_cols, target_col, continents=None,
                      dropna=True):
     # Loading the dataframe
-    data = pd.read_csv('data/merged_data/model_data_owid.csv',
+    data = pd.read_csv('./data/final_data.csv',
                        parse_dates=['date']).set_index('date')
 
     #data = pd.read_csv('data/merged_data/economic_cli.csv',

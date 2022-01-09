@@ -42,9 +42,9 @@ economic:
     - gdp_2021_06_30 
     - gdp_2021_09_30 
     - gdp_2021_12_31
-    - fiscal_measures
-    - emergency_investment_in_health_care
-    - investment_in_vaccines
+    # - fiscal_measures
+    # - emergency_investment_in_health_care
+    # - investment_in_vaccines
     
     
 weather:
@@ -69,9 +69,9 @@ policies:
     - close_public_transport
     - stay_at_home_requirements
     - public_information_campaigns
-    - testing_policy
-    - vaccination_policy
-    - contact_tracing
+    #- testing_policy
+    #- vaccination_policy
+    #- contact_tracing
     - restrictions_on_internal_movement
     - international_travel_controls
 

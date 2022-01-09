@@ -2,7 +2,7 @@
 n_layers: 1
 
 # Max number of epochs (if no early stopping)
-max_epochs: 300
+max_epochs: 40
 
 # Learning rate config
 auto_lr_find: True

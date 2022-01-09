@@ -7,11 +7,12 @@ import matplotlib.dates as mdates
 
 
 class Plot:
-  def __init__(self, df, target_col, target_country, save_path):
+  def __init__(self, df, target_col, target_country, country_name, save_path):
     self.__df = df
     self.__target_col = target_col
     self.__target_country = target_country
     self.__save_path = save_path
+    self.__country_name = country_name
 
   @staticmethod
   def __compute_diagonal_mean(values):
@@ -117,7 +118,7 @@ class Plot:
         plt.title(f"Features importances for {self.__target_country}")
         shap.summary_plot(var_shap_df.values, var_val_data_df)
 
-  def plot_results(self, pred, std=None, target_name='R', plot_error=True, show=True, plot_ci = False):
+  def plot_results(self, pred, std=None, target_name='R_E', plot_error=True, show=True, plot_ci = False, axis=None, show_x_label=False, show_legend=False):
     """Plot a target prediction for a given country"""
 
     # Computing the ground truth (true R of the val set)
@@ -132,12 +133,13 @@ class Plot:
     # Absolute error for every prediction
     error_curve = np.abs(ground - pred)
 
-    fig = plt.figure(figsize=(12, 3), dpi=100)
-    axis = plt.gca()
+    if axis is None:
+      fig = plt.figure(figsize=(12, 3), dpi=100)
+      axis = plt.gca()
 
     # Plot curves
-    axis.set_title(f'Predictions for {self.__target_country}')
-    axis.plot(index, ground, label=f'Ground {target_name}')
+    axis.set_title(f'Predictions for {self.__country_name} ({self.__target_country})')
+    axis.plot(index, ground, label=f'Reported {target_name}')
     axis.plot(index, pred, label=f'Predicted {target_name}')
 
     if plot_error:
@@ -155,20 +157,25 @@ class Plot:
       axis.fill_between(index, (pred - ci), (pred + ci), facecolor='r', alpha=.3)
 
     # Setup x ticks
-    axis.xaxis.set_major_locator(mdates.DayLocator(interval=7))
+    axis.xaxis.set_major_locator(mdates.DayLocator(interval=28))
     axis.xaxis.set_tick_params(rotation=90)
 
-    # Legend and labels
-    axis.legend()
     axis.set_ylabel(target_name)
-    axis.set_xlabel('Date')
+
+    # Legend and labels
+    if show_legend:
+      axis.legend()
+
+    if show_x_label:
+      axis.set_xlabel('Date')
     #axis.axhline(color='black', lw=1, ls='--', y=1)
     #axis.axhline(color='black', lw=1)
 
-    # Save plot in memory
-    if not show:
-      plt.savefig(self.__save_path + self.__target_country + '.png', bbox_inches='tight')
-    else:
-      plt.show()
+    if axis is None:
+      # Save plot in memory
+      if not show:
+        plt.savefig(self.__save_path + self.__target_country + '.pdf', bbox_inches='tight')
+      else:
+        plt.show()
 
-    plt.close()
+      plt.close()
