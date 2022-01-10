@@ -1,12 +1,12 @@
 # WHAT IF...? A global pandemic policy simulator
 
-Almost two years since its emergence, **COVID-19** is still challenging policymakers to find the optimal combination of policies that best mitigate viral transmission as well as its collateral socio-economic damage. _What if...?_ is an Artificial Intelligence that quantifies the efficacy of the type, duration, and stringency of mitigation strategies for COVID-19 in terms of pandemic control and economic loss. 
+Almost two years since its emergence, **COVID-19** is still challenging policymakers to find the optimal combination of policies that best mitigate viral transmission as well as its collateral socio-economic damage. _What if...?_ is an AI-powered pandemic policy decision support system that quantifies the efficacy of the type, duration, and stringency of mitigation strategies for COVID-19 in terms of pandemic control and economic loss. 
 It consists of three main modules:
-- **COVID-19 Reproduction Rate prediction**: a hybrid neural network (MLP and LSTM) is used to predict the reproduction rate of the virus in a given time frame for a given country. The prediction is based on the adopted country's policies and some country-specific socio-economic factors ([DATA](#data)).
-- **COVID-19 Unemployment rate prediction**: the same architecture is used to predict how policies affect the unemployment rate of a given country.
-- **Best policy mix**: a Reinforcement Learning algorithm is used to find the optimal policy mix for a given country for the next month.
+- **COVID-19 Reproduction Rate prediction**: a hybrid neural network (MLP and LSTM) to predict the reproduction rate of the virus in a given time frame for a given country. The prediction is based on the adopted country's policies and some country-specific socio-economic factors ([DATA](#data)).
+- **COVID-19 Unemployment rate prediction**: the same architecture is used to predict how policies affect the unemployment rate of a given country and time.
+- **Best policy mix prediction**: a Reinforcement Learning algorithm is used to find the optimal policy mix for a given country for the following month.
 
-The results are presented on an interactive platform, where the user can select a country and a time frame for which he/she wants to visualize the network's predictions and explore how the pandemic would have evolved in a _What if...?_ scenario. The user can indeed change the policies the country adopted in the chosen timeframe and the country's socio-economic characteristics, and the predictions will be updated accordingly ([more details here](#platform---frontend)).
+The results are presented on an interactive platform, where the user can select a country and a time frame on which to visualize the network's predictions and explore how these parameters would have evolved in a _What if...?_ scenario. The user can test the effect of tweaking various policies or socio-economic characteristics of the country, to visualise the changes in predictions ([more details here](#platform---frontend)).
 
 **NOTE**: This README is complementary to [our paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3937561). It is not meant to be a complete description of the project but rather a summary of the project's main components, in terms of their technical implementation and practical details to be used by researchers.
 
@@ -190,13 +190,13 @@ In the file `endpoint.py`, you can find the API endpoints. You can follow the sa
 
 ## PLATFORM - FRONTEND
 ---
-Firstly, the frontend has been coded using Angular. The entire code is available [here](https://github.com/epfl-iglobalhealth/what-if_platform_frontend).
+The frontend has been coded using Angular. The code is available [here](https://github.com/epfl-iglobalhealth/what-if_platform_frontend).
 
 ### WORKFLOW
 The user firstly visualizes a welcome page.
 ![Welcome page](readme_images/frontend-1.png)
 
-After clicking on `Explore the platform`, the user is redirected to the main page, where he/she can interact with the reproduction rate model. 
+After clicking on `Explore the platform`, the user is redirected to the main page, where they can interact with the reproduction rate model. 
 
 ![Main page](readme_images/frontend-2.png)
 
@@ -292,17 +292,29 @@ Optionally, in the `nginx` folder, you can edit the `default.conf` file to chang
 
 ## FUTURE WORK
 ---
-Two aspects of this research can be improved.
+
+### UPDATING
+The data should be updated regularly. A pipeline to automate this would be valuable. Additionally the dates of the training data should be clearly stated on the main page in the form of "last model update:...".
+
+### KEY EVENT
+Some visualisations should be viewed in context. i.e. the emergence of various strains, vaccines etc.
+
+### ADD DATA
+We should source and add data on the % of strains in each country and the estimated seroprevalence of the population.
+While it risks being uninformative, social media and news mentions of COVID, restictions and public sentiment (e.g. Twitter and news mentions) could also be added.
 
 ### MODELS
-The unemployment rate is an economic indicator that is not measured daily. As explained in our paper, in order to try to relate the unemployment rate to the policies each country enforced, we used interpolation and many other tricks to obtain a daily outcome. Still, this economic indicator is not available or poorly measured for many countries, and our model performances are not satisfactory.
-As a future improvement, we would like to find a better economic index, available and reliable.
+The unemployment rate is an economic indicator that is not measured daily. As explained in our paper, in order to try to relate the unemployment rate to the policies each country enforced, we used interpolation and many other tricks (see details in paper) to obtain a daily outcome. Still, this economic indicator is not available or poorly measured for many countries, and our model performances are not satisfactory.
+As a future improvement, we would like to find a better macro- or micro-economic index, which is both more globally available and more reliable.
 
-We identified [this research project](http://sustain.stanford.edu/predicting-poverty) from Stanford University, which might be a good start. They claim they are able to predict socioeconomic indicators of poverty and wealth through satellite images (specifically of night lights). Given their work, the steps to follow would be:
+We identified [this research project](http://sustain.stanford.edu/predicting-poverty) from Stanford University, which might be a good start. They claim to be able to predict socioeconomic indicators of poverty and wealth through satellite images (specifically by nuancing night light maps with daytime map features). Given their work, the steps to follow would be:
 - Try to reproduce their work to extract socioeconomic data from high-resolution daytime satellite imagery. 
-- Once validated their approach, using their methodology, use the predicted socioeconomic outcome as ground truth for our economic model, including as many countries as possible. In particular, we would like to relate the newly estimated indicator to the restrictions each country implemented.
+- Once validated, one could use the predicted socioeconomic outcome as ground truth for the _What If...?_ economic model, including as many countries as possible. In particular, we would like to relate the newly estimated indicator to the restrictions each country implemented.
 
 A good starting point to reproduce the paper mentioned above could be to use [this repository](https://worldbank.github.io/OpenNightLights/wb-light-every-night-readme.html).
 
 ### PLATFORM
 As we showed, the Reinforcement Learning part of the project, despite having been validated, has not been implemented into the platform yet. Thus, you should implement new endpoints and expand the platform to include the RL models.
+
+### SECONDARY ANALYSIS
+The platform can be used to track the efficacy of policies over time for various countries which may be interesting in itself.
