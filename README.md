@@ -8,7 +8,7 @@ It consists of three main modules:
 
 The results are presented on an interactive platform, where the user can select a country and a time frame on which to visualize the network's predictions and explore how these parameters would have evolved in a _What if...?_ scenario. The user can test the effect of tweaking various policies or socio-economic characteristics of the country, to visualise the changes in predictions ([more details here](#platform---frontend)).
 
-**NOTE**: This README is complementary to [our paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3937561). It is not meant to be a complete description of the project but rather a summary of the project's main components, in terms of their technical implementation and practical details to be used by researchers.
+**NOTE**: This README is complementary to [our paper](https://doi.org/10.1371/journal.pgph.0000721). It is not meant to be a complete description of the project but rather a summary of the project's main components, in terms of their technical implementation and practical details to be used by researchers.
 
 ## TABLE OF CONTENTS
 ---
