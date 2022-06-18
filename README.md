@@ -27,7 +27,7 @@ The results are presented on an interactive platform, where the user can select 
 
 ## MODELS
 ---
-The model's repository is accessible [here](https://github.com/epfl-iglobalhealth/WhatIf-model-bros). The repository is organised as follows:
+The model's repository is accessible [here](https://github.com/epfl-iglobalhealth/What-If_model). The repository is organised as follows:
 
 ```
 .
